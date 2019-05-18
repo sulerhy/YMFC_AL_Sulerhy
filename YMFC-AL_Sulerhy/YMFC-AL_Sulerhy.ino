@@ -66,6 +66,7 @@ float angle_roll_acc, angle_pitch_acc, angle_pitch, angle_roll;
 //Setup routine
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void setup(){
+
   mode = 0;                                                                //Set start back to zero.
   i = 0;
   gyro_address = 0x68;                                           //Store the gyro address in the variable.
@@ -142,6 +143,7 @@ void setup(){
 
   //When everything is done, turn off the led.
   digitalWrite(12,LOW);                                                     //Turn off the warning led.
+  digitalWrite(13,LOW);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Main program loop
@@ -150,9 +152,10 @@ void loop(){
 
   //65.5 = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
   gyro_roll_input = (gyro_roll_input * 0.7) + ((gyro_roll / 65.5) * 0.3);   //Gyro pid input is deg/sec.
-  gyro_pitch_input = (gyro_pitch_input * 0.7) + ((gyro_pitch / 65.5) * 0.3);//Gyro pid input is deg/sec.
-  gyro_yaw_input = (gyro_yaw_input * 0.7) + ((gyro_yaw / 65.5) * 0.3);      //Gyro pid input is deg/sec.
 
+  gyro_pitch_input = (gyro_pitch_input * 0.7) + ((gyro_pitch / 65.5) * 0.3);//Gyro pid input is deg/sec.
+
+  gyro_yaw_input = (gyro_yaw_input * 0.7) + ((gyro_yaw / 65.5) * 0.3);      //Gyro pid input is deg/sec.
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //This is the added IMU code from the videos:
@@ -168,7 +171,7 @@ void loop(){
   //0.000001066 = 0.0000611 * (3.142(PI) / 180degr) The Arduino sin function is in radians
   angle_pitch -= angle_roll * sin(gyro_yaw * 0.000001066);                  //If the IMU has yawed transfer the roll angle to the pitch angel.
   angle_roll += angle_pitch * sin(gyro_yaw * 0.000001066);                  //If the IMU has yawed transfer the pitch angle to the roll angel.
-
+  
   //Accelerometer angle calculations
   acc_total_vector = sqrt((acc_x*acc_x)+(acc_y*acc_y)+(acc_z*acc_z));       //Calculate the total accelerometer vector.
   
@@ -188,6 +191,10 @@ void loop(){
 
   pitch_level_adjust = angle_pitch * 15;                                    //Calculate the pitch angle correction
   roll_level_adjust = angle_roll * 15;                                      //Calculate the roll angle correction
+  // auto-level: off
+  pitch_level_adjust = 0;                               //AL-OFF
+  roll_level_adjust = 0;                                //AL-OFF
+  /////
   //For starting the motors: throttle low and yaw left (step 1).
   if(receiver_input_channel_3 < 1050 && receiver_input_channel_4 < 1050)mode = 1;
   //When yaw stick is back in the center position start the motors (step 2).
@@ -214,7 +221,7 @@ void loop(){
   //We need a little dead band of 16us for better results.
   if(receiver_input_channel_1 > 1508)pid_roll_setpoint = receiver_input_channel_1 - 1508;
   else if(receiver_input_channel_1 < 1492)pid_roll_setpoint = receiver_input_channel_1 - 1492;
-
+  
   pid_roll_setpoint -= roll_level_adjust;                                   //Subtract the angle correction from the standardized receiver roll input value.
   pid_roll_setpoint /= 3.0;                                                 //Divide the setpoint for the PID roll controller by 3 to get angles in degrees.
 
@@ -246,7 +253,7 @@ void loop(){
   battery_voltage = battery_voltage * 0.92 + (analogRead(0) + 65) * 0.09853;
 
   //Turn on the led if battery voltage is to low.
-  if(battery_voltage < 1000 && battery_voltage > 600)digitalWrite(12, HIGH);
+  if(battery_voltage < 1000 && battery_voltage > 600)digitalWrite(13, HIGH);
 
 
   throttle = receiver_input_channel_3;                                      //We need the throttle signal as a base signal.
@@ -387,19 +394,21 @@ void gyro_signalen(){
   Wire.requestFrom(gyro_address,14);                                      //Request 14 bytes from the gyro.
   
   while(Wire.available() < 14);                                           //Wait until the 14 bytes are received.
-  gyro_roll = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the acc_x variable.
-  gyro_pitch = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the acc_y variable.
-  gyro_yaw = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the acc_z variable.
-  temperature = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the temperature variable.
+
   acc_y = Wire.read()<<8|Wire.read();                              //Read high and low part of the angular data.
   acc_x = Wire.read()<<8|Wire.read();                              //Read high and low part of the angular data.
   acc_z = Wire.read()<<8|Wire.read();                              //Read high and low part of the angular data.
+  temperature = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the temperature variable.
+  gyro_roll = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the acc_x variable.
+  gyro_pitch = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the acc_y variable.
+  gyro_yaw = Wire.read()<<8|Wire.read();                               //Add the low and high byte to the acc_z variable.
 
   if(cal_int == 2000){
     gyro_roll -= gyro_setpoint_roll;                                       //Only compensate after the calibration.
     gyro_pitch -= gyro_setpoint_pitch;                                       //Only compensate after the calibration.
     gyro_yaw -= gyro_setpoint_yaw;                                       //Only compensate after the calibration.
   }
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

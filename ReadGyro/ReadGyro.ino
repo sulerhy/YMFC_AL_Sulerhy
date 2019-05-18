@@ -124,6 +124,8 @@ void loop() {
   while(micros()<loop_timer + 4000);
   loop_timer = micros();
   Serial.println(gyro_roll_input);
+  Serial.println(gyro_pitch_input);
+  Serial.println(gyro_yaw_input);
 }
 
 void set_gyro_registers(){
