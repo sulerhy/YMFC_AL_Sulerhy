@@ -204,7 +204,7 @@ void loop(){
   if (loop_reading == 60){
     loop_reading = 0;
   }
-  
+
   pitch_level_adjust = angle_pitch * 15;                                    //Calculate the pitch angle correction
   roll_level_adjust = angle_roll * 15;                                      //Calculate the roll angle correction
 
@@ -277,6 +277,18 @@ void loop(){
 
   if (mode == 2){                                                          //The motors are started.
     if (throttle > 1800) throttle = 1800;                                   //We need some room to keep full control at full throttle.
+    if (loop_reading == 20) {
+      Serial.print ("pid_output_roll:");
+    }
+    if (loop_reading == 25) {
+      Serial.print (pid_output_roll);
+    }
+    if (loop_reading == 30) {
+      Serial.print ("pid_output_yaw:");
+    }
+    if (loop_reading == 35) {
+      Serial.println (pid_output_yaw);
+    }
     esc_1 = throttle - pid_output_pitch + pid_output_roll - pid_output_yaw; //Calculate the pulse for esc 1 (front-right - CCW)
     esc_2 = throttle + pid_output_pitch + pid_output_roll + pid_output_yaw; //Calculate the pulse for esc 2 (rear-right - CW)
     esc_3 = throttle + pid_output_pitch - pid_output_roll - pid_output_yaw; //Calculate the pulse for esc 3 (rear-left - CCW)
@@ -440,10 +452,31 @@ void gyro_signalen(){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void calculate_pid(){
   //Roll calculations
+
   pid_error_temp = gyro_roll_input - pid_roll_setpoint;
   pid_i_mem_roll += pid_i_gain_roll * pid_error_temp;
   if(pid_i_mem_roll > pid_max_roll)pid_i_mem_roll = pid_max_roll;
   else if(pid_i_mem_roll < pid_max_roll * -1)pid_i_mem_roll = pid_max_roll * -1;
+
+  // thang nao la thang lam cho cac thong so PID tang len????
+  if (loop_reading == 40) {
+    Serial.print ("pid_p_gain_roll:");
+  }
+  if (loop_reading == 45) {
+    Serial.print (pid_p_gain_roll * pid_error_temp);
+  }
+  if (loop_reading == 50) {
+    Serial.print ("pid_i_mem_roll:");
+  }
+  if (loop_reading == 53) {
+    Serial.print (pid_i_mem_roll);
+  }
+  if (loop_reading == 54) {
+    Serial.print ("pid_d_gain_roll:");
+  }
+  if (loop_reading == 55) {
+    Serial.println (pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error));
+  }
 
   pid_output_roll = pid_p_gain_roll * pid_error_temp + pid_i_mem_roll + pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error);
   if(pid_output_roll > pid_max_roll)pid_output_roll = pid_max_roll;
