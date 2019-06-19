@@ -17,8 +17,8 @@
 
 #include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
 #include <math.h>  
-#define RAD_TO_DEG = 57.2957786;
-#define PI = 3.1415926;
+float RAD_TO_DEG_NUMBER = 57.2957786;
+float PI_NUMBER = 3.141592;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //PID gain and limit settings
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,18 +188,18 @@ void loop(){
   // angle_roll = angle_roll * 0.9996 + angle_roll_acc * 0.0004;               //Correct the drift of the gyro roll angle with the accelerometer roll angle.
 
 // print angle 
-  if (loop_reading == 0) {
-    Serial.print ("angle_roll: ");
-  }
-  if (loop_reading == 5) {
-    Serial.print (angle_roll);
-  }
-  if (loop_reading == 10) {
-    Serial.print ("angle_pitch: ");
-  }
-  if (loop_reading == 15) {
-    Serial.println (angle_pitch);
-  }
+//  if (loop_reading == 0) {
+//    Serial.print ("angle_roll: ");
+//  }
+//  if (loop_reading == 5) {
+//    Serial.print (angle_roll);
+//  }
+//  if (loop_reading == 10) {
+//    Serial.print ("angle_pitch: ");
+//  }
+//  if (loop_reading == 15) {
+//    Serial.println (angle_pitch);
+//  }
 
   loop_reading ++;
   if (loop_reading == 60){
@@ -440,9 +440,16 @@ void gyro_signalen(){
   }
 
   // **************TURN ON/OFF ANGLE IN THE SECOND WAY**************************
-  angle_pitch = RAD_TO_DEG * (atan2(acc_x, acc_z) + PI);
-  angle_roll = RAD_TO_DEG * (atan2(acc_y, acc_z) + PI);
-
+  angle_roll = RAD_TO_DEG_NUMBER * (atan2(acc_x, acc_z) + PI_NUMBER);
+  if (angle_roll > 180){
+    angle_roll = -(360.0 - angle_roll);
+    }
+  angle_pitch = RAD_TO_DEG_NUMBER * (atan2(acc_y, acc_z) + PI_NUMBER);
+  if (angle_pitch > 180){
+    angle_pitch = (360.0 - angle_pitch);
+    }else if (angle_pitch <= 180){
+    angle_pitch = - angle_pitch;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -459,33 +466,33 @@ void calculate_pid(){
   if(pid_i_mem_roll > pid_max_roll)pid_i_mem_roll = pid_max_roll;
   else if(pid_i_mem_roll < pid_max_roll * -1)pid_i_mem_roll = pid_max_roll * -1;
 
-    // Check pid_roll_setpoint
-  if (loop_reading == 43) {
-    Serial.print ("pid_roll_setpoint: ");
-  }
-    if (loop_reading == 46) {
-    Serial.println (pid_roll_setpoint);
-  }
+//     Check pid_roll_setpoint
+//  if (loop_reading == 43) {
+//    Serial.print ("pid_roll_setpoint: ");
+//  }
+//    if (loop_reading == 46) {
+//    Serial.println (pid_roll_setpoint);
+//  }
 
-  // // thang nao la thang lam cho cac thong so PID tang len????
-  // if (loop_reading == 40) {
-  //   Serial.print ("pid_p_gain_roll: ");
-  // }
-  // if (loop_reading == 45) {
-  //   Serial.print (pid_p_gain_roll * pid_error_temp);
-  // }
-  // if (loop_reading == 50) {
-  //   Serial.print ("pid_i_mem_roll: ");
-  // }
-  // if (loop_reading == 53) {
-  //   Serial.print (pid_i_mem_roll);
-  // }
-  // if (loop_reading == 54) {
-  //   Serial.print ("pid_d_gain_roll: ");
-  // }
-  // if (loop_reading == 55) {
-  //   Serial.println (pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error));
-  // }
+   // thang nao la thang lam cho cac thong so PID tang len????
+   if (loop_reading == 40) {
+     Serial.print ("pid_p_gain_roll: ");
+   }
+   if (loop_reading == 45) {
+     Serial.print (pid_p_gain_roll * pid_error_temp);
+   }
+   if (loop_reading == 50) {
+     Serial.print ("pid_i_mem_roll: ");
+   }
+   if (loop_reading == 53) {
+     Serial.print (pid_i_mem_roll);
+   }
+   if (loop_reading == 54) {
+     Serial.print ("pid_d_gain_roll: ");
+   }
+   if (loop_reading == 55) {
+     Serial.println (pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error));
+   }
 
   pid_output_roll = pid_p_gain_roll * pid_error_temp + pid_i_mem_roll + pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error);
   if(pid_output_roll > pid_max_roll)pid_output_roll = pid_max_roll;

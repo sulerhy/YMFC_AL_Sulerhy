@@ -1,35 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////////
-//Terms of use
-///////////////////////////////////////////////////////////////////////////////////////
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//THE SOFTWARE.
-//
-///////////////////////////////////////////////////////////////////////////////////////
-//Safety note
-///////////////////////////////////////////////////////////////////////////////////////
-//Always remove the propellers and stay away from the motors unless you 
-//are 100% certain of what you are doing.
-///////////////////////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-//The program will start in calibration mode.
-//Send the following characters / numbers via the serial monitor to change the mode
-//
-//r = print receiver signals.
-//a = print quadcopter angles.
-//1 = check rotation / vibrations for motor 1 (right front CCW).
-//2 = check rotation / vibrations for motor 2 (right rear CW).
-//3 = check rotation / vibrations for motor 3 (left rear CCW).
-//4 = check rotation / vibrations for motor 4 (left front CW).
-//5 = check vibrations for all motors together.
-
 
 #include <Wire.h>                                    //Include the Wire.h library so we can communicate with the gyro.
 #include <EEPROM.h>                                  //Include the EEPROM.h library so we can store information onto the EEPROM
