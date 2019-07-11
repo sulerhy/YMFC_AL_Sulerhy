@@ -319,6 +319,24 @@ void loop(){
     esc_3 = 1000;                                                           //If start is not 2 keep a 1000us pulse for ess-3.
     esc_4 = 1000;                                                           //If start is not 2 keep a 1000us pulse for ess-4.
   }
+     if (esc_1 == 40) {
+     Serial.print ("esc_1: ");
+   }
+   if (loop_reading == 45) {
+     Serial.print (esc_1);
+   }
+   if (loop_reading == 50) {
+     Serial.print ("esc_2: ");
+   }
+   if (loop_reading == 53) {
+     Serial.println (esc_2);
+   }
+   if (loop_reading == 54) {
+     Serial.print ("esc_3: ");
+   }
+   if (loop_reading == 55) {
+     Serial.println (esc_3);
+   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   //Creating the pulses for the ESC's is explained in this video:
@@ -475,24 +493,24 @@ void calculate_pid(){
 //  }
 
    // thang nao la thang lam cho cac thong so PID tang len????
-   if (loop_reading == 40) {
-     Serial.print ("pid_p_gain_roll: ");
-   }
-   if (loop_reading == 45) {
-     Serial.print (pid_p_gain_roll * pid_error_temp);
-   }
-   if (loop_reading == 50) {
-     Serial.print ("pid_i_mem_roll: ");
-   }
-   if (loop_reading == 53) {
-     Serial.print (pid_i_mem_roll);
-   }
-   if (loop_reading == 54) {
-     Serial.print ("pid_d_gain_roll: ");
-   }
-   if (loop_reading == 55) {
-     Serial.println (pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error));
-   }
+//   if (loop_reading == 40) {
+//     Serial.print ("pid_p_gain_roll: ");
+//   }
+//   if (loop_reading == 45) {
+//     Serial.print (pid_p_gain_roll * pid_error_temp);
+//   }
+//   if (loop_reading == 50) {
+//     Serial.print ("pid_i_mem_roll: ");
+//   }
+//   if (loop_reading == 53) {
+//     Serial.println (pid_i_mem_roll);
+//   }
+//   if (loop_reading == 54) {
+//     Serial.print ("pid_d_gain_roll: ");
+//   }
+//   if (loop_reading == 55) {
+//     Serial.println (pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error));
+//   }
 
   pid_output_roll = pid_p_gain_roll * pid_error_temp + pid_i_mem_roll + pid_d_gain_roll * (pid_error_temp - pid_last_roll_d_error);
   if(pid_output_roll > pid_max_roll)pid_output_roll = pid_max_roll;
